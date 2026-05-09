@@ -59,11 +59,13 @@
     "ssh_key": ""
   },
   "meta": {
-    "filename": "Ra-01_Handy_Neo.kicad_prl",
+    "filename": "Handy_LoRa.kicad_prl",
     "version": 5
   },
   "net_inspector_panel": {
     "col_hidden": [
+      false,
+      false,
       false,
       false,
       false,
@@ -85,7 +87,9 @@
       6,
       7,
       8,
-      9
+      9,
+      10,
+      11
     ],
     "col_widths": [
       156,
@@ -96,6 +100,8 @@
       103,
       103,
       60,
+      103,
+      103,
       103,
       103
     ],
