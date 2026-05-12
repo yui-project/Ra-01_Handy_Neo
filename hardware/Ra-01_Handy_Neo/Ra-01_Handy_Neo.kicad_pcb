@@ -10032,7 +10032,7 @@
 		(descr "JEITA  SOIC, 16 Pin (JEITA/EIAJ ED-7311-19, variation 16-001-ABA, https://www.jeita.or.jp/japanese/standard/book/ED-7311-19/#target/page_no=30), generated with kicad-footprint-generator ipc_gullwing_generator.py")
 		(tags "JEITA SOIC SO P-SOP-16 P-SOP16-03.90x09.90-1.27 P-SOP16-0225-1.27 SOIC_N narrow")
 		(property "Reference" "U2"
-			(at 0 5.9 0)
+			(at 0 -0.135 90)
 			(layer "B.SilkS")
 			(uuid "03a166f6-94da-4bae-a411-d5b1f509e017")
 			(effects
@@ -10462,7 +10462,7 @@
 		(descr "JEITA  SOIC, 16 Pin (JEITA/EIAJ ED-7311-19, variation 16-001-ABA, https://www.jeita.or.jp/japanese/standard/book/ED-7311-19/#target/page_no=30), generated with kicad-footprint-generator ipc_gullwing_generator.py")
 		(tags "JEITA SOIC SO P-SOP-16 P-SOP16-03.90x09.90-1.27 P-SOP16-0225-1.27 SOIC_N narrow")
 		(property "Reference" "U3"
-			(at 0 5.9 0)
+			(at 0 -0.135 90)
 			(layer "B.SilkS")
 			(uuid "33d5556b-1bdf-47b3-bd64-5c34e776aebf")
 			(effects
