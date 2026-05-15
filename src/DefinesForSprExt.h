@@ -3,6 +3,8 @@
 #define ENTER_TEST // 文字入力テスト
 #define DEFAULT // 通常使用時
 
+#define IS_SERIAL // シリアル通信でのデバッグ出力を有効にする
+
 // Digital Pins
 #define RA_CS 9
 #define RA_RESET 10
