@@ -161,14 +161,14 @@ uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
     }
 
     #ifdef IS_SERIAL
-    Serial.print(output);
+    /*Serial.print(output);
     if(mode == ALPHABET_MODE && pendingButtonBit != 255){
         // 選択中の候補文字を [ ] で表示
         Serial.print("[");
         Serial.print(alphabetCandidates[pendingButtonBit][pendingCharIndex]);
         Serial.print("]");
     }
-    Serial.println();
+    Serial.println();*/
     #endif
 
     return SUCCESS;
