@@ -6849,7 +6849,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H5mm"
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H6.5mm"
 			(at 236.22 134.62 0)
 			(effects
 				(font
@@ -7327,7 +7327,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H5mm"
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H6.5mm"
 			(at 160.02 134.62 0)
 			(effects
 				(font
@@ -7661,7 +7661,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H5mm"
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H6.5mm"
 			(at 146.05 134.62 0)
 			(effects
 				(font
@@ -7797,7 +7797,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H5mm"
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H6.5mm"
 			(at 223.52 134.62 0)
 			(effects
 				(font
@@ -8177,7 +8177,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H5mm"
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H6.5mm"
 			(at 198.12 134.62 0)
 			(effects
 				(font
@@ -8445,7 +8445,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H5mm"
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H6.5mm"
 			(at 261.62 134.62 0)
 			(effects
 				(font
@@ -8783,7 +8783,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H5mm"
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H6.5mm"
 			(at 101.6 134.62 0)
 			(effects
 				(font
@@ -8919,7 +8919,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H5mm"
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H6.5mm"
 			(at 172.72 134.62 0)
 			(effects
 				(font
@@ -8989,7 +8989,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H5mm"
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H6.5mm"
 			(at 116.84 134.62 0)
 			(effects
 				(font
@@ -9059,7 +9059,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Connector_Coaxial:SMA_BAT_Wireless_BWSMA-KWE-Z001"
+		(property "Footprint" "Connector_Coaxial:SMA_Connector_at_Honbu_3-1478978-1"
 			(at 76.2 116.84 0)
 			(effects
 				(font
@@ -9784,7 +9784,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H5mm"
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H6.5mm"
 			(at 132.08 134.62 0)
 			(effects
 				(font
@@ -10130,7 +10130,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H5mm"
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H6.5mm"
 			(at 210.82 134.62 0)
 			(effects
 				(font
@@ -11182,7 +11182,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H5mm"
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H6.5mm"
 			(at 248.92 134.62 0)
 			(effects
 				(font
@@ -11516,7 +11516,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H5mm"
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm_H6.5mm"
 			(at 185.42 134.62 0)
 			(effects
 				(font
