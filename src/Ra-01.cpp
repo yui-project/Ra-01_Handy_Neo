@@ -6,6 +6,6 @@ void Ra01::begin(uint8_t cs, uint8_t reset, uint8_t dio0){
         #ifdef IS_SERIAL
         Serial.println("Starting LoRa failed!");
         #endif
-        while (1);
+        // while (1);
     }
 }
