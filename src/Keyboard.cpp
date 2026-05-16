@@ -101,8 +101,8 @@ uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
                 } else {
                     // 別のボタン → 前の選択を確定してから新しい選択を開始
                     if(pendingButtonBit != 255){
-                        char ch = alpKeyBinds[pendingButtonBit][pendingCharIndex];
-                        strcat(output, &ch);
+                        char ch[2] = {alpKeyBinds[pendingButtonBit][pendingCharIndex], '\0'};
+                        strcat(output, ch);
                     }
                     pendingButtonBit = i;
                     pendingCharIndex = 0;
@@ -127,8 +127,8 @@ uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
         if(buttonStat & (1 << 11)){ // Enter
             if(pendingButtonBit != 255){
                 // 未確定文字を確定してバッファへ追加
-                char ch = alpKeyBinds[pendingButtonBit][pendingCharIndex];
-                strcat(output, &ch);
+                char ch[2] = {alpKeyBinds[pendingButtonBit][pendingCharIndex], '\0'};
+                strcat(output, ch);
                 pendingInit();
             } else {
                 // 未確定なし → 入力完了
