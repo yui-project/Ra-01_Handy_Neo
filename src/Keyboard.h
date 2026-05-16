@@ -2,6 +2,8 @@
 
 #include <ShiftIn.h>
 
+#define IS_SERIAL // シリアル通信でのデバッグ出力を有効にする
+
 // buttons
 #define BUTTON_NUM 16
 
@@ -28,11 +30,39 @@
 #define ALPHABET_MODE 1
 
 constexpr uint32_t DEBOUNCE_TIME_MS = 20;
+
+const char* const alpKeyBinds[10] = {
+    "()!?&", // bit 0: BUTTON_1
+    "ABC",   // bit 1: BUTTON_2
+    "DEF",   // bit 2: BUTTON_3
+    "GHI",   // bit 3: BUTTON_4
+    "JKL",   // bit 4: BUTTON_5
+    "MNO",   // bit 5: BUTTON_6
+    "PQRS",  // bit 6: BUTTON_7
+    "TUV",   // bit 7: BUTTON_8
+    "WXYZ",  // bit 8: BUTTON_9
+    " ",     // bit 9: BUTTON_0
+};
+
+const uint8_t alpKeyBindsLen[10] = {
+    strlen(alpKeyBinds[0]), // bit 0: BUTTON_1
+    strlen(alpKeyBinds[1]), // bit 1: BUTTON_2
+    strlen(alpKeyBinds[2]), // bit 2: BUTTON_3
+    strlen(alpKeyBinds[3]), // bit 3: BUTTON_4
+    strlen(alpKeyBinds[4]), // bit 4: BUTTON_5
+    strlen(alpKeyBinds[5]), // bit 5: BUTTON_6
+    strlen(alpKeyBinds[6]), // bit 6: BUTTON_7
+    strlen(alpKeyBinds[7]), // bit 7: BUTTON_8
+    strlen(alpKeyBinds[8]), // bit 8: BUTTON_9
+    strlen(alpKeyBinds[9])  // bit 9: BUTTON_0
+};
 class Keyboard{
     private:
         uint8_t mode = NUMBER_MODE;
         uint8_t pendingButtonBit = 255; // 選択中のボタンのビット位置（255=未選択）
         uint8_t pendingCharIndex = 0;   // 候補文字のインデックス
+
+        void pendingInit();
 
     public:
         void begin(int ploadPin, int dataPin, int clockPin);

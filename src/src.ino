@@ -30,11 +30,12 @@ void loop() {
     #ifdef ENTER_TEST
     uint8_t val = key.getCharInput(input, INPUT_MAX_LEN);
     if(val == ENTER){
-        Serial.println("--------Enterer Text--------");
+        Serial.println("--------Entered Text--------");
         for(int i = 0; i  < INPUT_MAX_LEN; i++){
             Serial.print(input[i]);
             input[i] = '\0'; // 確定後にバッファをクリア
         }
+        Serial.println();
         Serial.println("----------------------------");
         delay(2000);
     }

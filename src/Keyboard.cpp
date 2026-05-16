@@ -54,19 +54,6 @@ uint16_t Keyboard::idle(){
     return 0;
 }
 
-static const char* const alphabetCandidates[10] = {
-    "()!?&", // bit 0: BUTTON_1
-    "ABC",   // bit 1: BUTTON_2
-    "DEF",   // bit 2: BUTTON_3
-    "GHI",   // bit 3: BUTTON_4
-    "JKL",   // bit 4: BUTTON_5
-    "MNO",   // bit 5: BUTTON_6
-    "PQRS",  // bit 6: BUTTON_7
-    "TUV",   // bit 7: BUTTON_8
-    "WXYZ",  // bit 8: BUTTON_9
-    " ",     // bit 9: BUTTON_0
-};
-
 uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
     uint16_t buttonStat = idle();
     if(strlen(output) + 1 >= maxLen) return FAILURE;
@@ -74,12 +61,16 @@ uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
     if(mode == NUMBER_MODE){
         const char* numChars[] = {"1","2","3","4","5","6","7","8","9","0"};
         for(int i = 0; i < 10; i++){
-            if(buttonStat & (1 << i)) strcat(output, numChars[i]);
+            if(buttonStat & (1 << i)){
+                strcat(output, numChars[i]);
+                break;
+            }
         }
 
         if(buttonStat & (1 << 10)){ // Backspace
-            if(strlen(output) > 0) output[strlen(output) - 1] = '\0';
-            else {
+            if(strlen(output) > 0){
+                output[strlen(output) - 1] = '\0';
+            } else {
                 #ifdef IS_SERIAL
                 Serial.println("Nothing to delete.");
                 #endif
@@ -91,7 +82,6 @@ uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
             Serial.println("-------------------------------------------");
             Serial.print("Entered: "); Serial.println(output);
             Serial.println("-------------------------------------------");
-            delay(1000);
             #endif
             return ENTER;
         }
@@ -101,16 +91,19 @@ uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
             Serial.println("Switched to ALPHABET mode.");
             #endif
         }
-    } else { // ALPHABET_MODE
+    } else if(mode == ALPHABET_MODE){ // ALPHABET_MODE
         // 数字ボタン（bit 0〜9）の押下チェック
         for(int i = 0; i < 10; i++){
             if(buttonStat & (1 << i)){
                 if(pendingButtonBit == (uint8_t)i){
                     // 同じボタン → 次の候補へサイクル
-                    uint8_t len = strlen(alphabetCandidates[i]);
-                    pendingCharIndex = (pendingCharIndex + 1) % len;
+                    pendingCharIndex = (pendingCharIndex + 1) % alpKeyBindsLen[i];
                 } else {
-                    // 別のボタン → 新しい選択を開始
+                    // 別のボタン → 前の選択を確定してから新しい選択を開始
+                    if(pendingButtonBit != 255){
+                        char ch = alpKeyBinds[pendingButtonBit][pendingCharIndex];
+                        strcat(output, &ch);
+                    }
                     pendingButtonBit = i;
                     pendingCharIndex = 0;
                 }
@@ -121,8 +114,7 @@ uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
         if(buttonStat & (1 << 10)){ // Backspace
             if(pendingButtonBit != 255){
                 // 未確定文字をキャンセル
-                pendingButtonBit = 255;
-                pendingCharIndex = 0;
+                pendingInit();
             } else if(strlen(output) > 0){
                 output[strlen(output) - 1] = '\0';
             } else {
@@ -135,10 +127,9 @@ uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
         if(buttonStat & (1 << 11)){ // Enter
             if(pendingButtonBit != 255){
                 // 未確定文字を確定してバッファへ追加
-                char ch[2] = {alphabetCandidates[pendingButtonBit][pendingCharIndex], '\0'};
-                strcat(output, ch);
-                pendingButtonBit = 255;
-                pendingCharIndex = 0;
+                char ch = alpKeyBinds[pendingButtonBit][pendingCharIndex];
+                strcat(output, &ch);
+                pendingInit();
             } else {
                 // 未確定なし → 入力完了
                 #ifdef IS_SERIAL
@@ -151,8 +142,7 @@ uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
             }
         }
         if(buttonStat & (1 << 12)){ // Switch
-            pendingButtonBit = 255;
-            pendingCharIndex = 0;
+            pendingInit();
             mode = NUMBER_MODE;
             #ifdef IS_SERIAL
             Serial.println("Switched to NUMBER mode.");
@@ -161,15 +151,19 @@ uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
     }
 
     #ifdef IS_SERIAL
-    /*Serial.print(output);
+    Serial.print(output);
     if(mode == ALPHABET_MODE && pendingButtonBit != 255){
-        // 選択中の候補文字を [ ] で表示
         Serial.print("[");
-        Serial.print(alphabetCandidates[pendingButtonBit][pendingCharIndex]);
+        Serial.print(alpKeyBinds[pendingButtonBit][pendingCharIndex]);
         Serial.print("]");
     }
-    Serial.println();*/
+    Serial.println();
     #endif
 
     return SUCCESS;
+}
+
+void Keyboard::pendingInit(){
+    pendingButtonBit = 255;
+    pendingCharIndex = 0;
 }
