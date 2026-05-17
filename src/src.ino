@@ -2,8 +2,10 @@
 #include "Ra-01.h"
 #include "DefinesForSprExt.h"
 #include "Keyboard.h"
+#include "display.h"
 
 Keyboard key;
+Display disp;
 
 #define INPUT_MAX_LEN 20
 char input[INPUT_MAX_LEN] = {0};
@@ -12,6 +14,7 @@ void setup() {
     Serial.begin(115200);
 
     key.begin(BSR_PL, BSR_SO, BSR_CP);
+    disp.begin();
 }
 
 void loop() {
@@ -29,17 +32,35 @@ void loop() {
     #endif
 
     #ifdef ENTER_TEST
-    uint8_t val = key.getCharInput(input, INPUT_MAX_LEN);
+    uint8_t val = key.getCharInput();
     if(val == ENTER){
-        Serial.println("--------Entered Text--------");
-        for(int i = 0; i  < INPUT_MAX_LEN; i++){
-            Serial.print(input[i]);
-            input[i] = '\0'; // 確定後にバッファをクリア
-        }
-        Serial.println();
-        Serial.println("----------------------------");
+        key.inputInit();
         delay(2000);
     }
+    #endif
+
+    #ifdef DISPLAY_TEST
+        disp.clear();
+        disp.showRecv("HELLOHELLOHELLOHELLO", millis(), "HELLOHELLOHELLOHELLOHELLO", millis() + 11111);
+
+        uint16_t keyStat = key.idle();
+
+        if(disp.showMenu() == FAILURE && keyStat & (1 << 9)){
+            disp.openMenu();
+            Serial.println("Menu opened.");
+        }
+
+        if(disp.showGuideToMenu() == FAILURE && keyStat & (1 << 7)){
+            disp.closeMenu();
+            Serial.println("Menu closed.");
+        }
+
+        disp.showSeparateLine();
+        //disp.showGuideToMenu();
+        //disp.showMenu();
+        disp.flush();
+
+        delay(100);
     #endif
 
     #ifdef DEFAULT

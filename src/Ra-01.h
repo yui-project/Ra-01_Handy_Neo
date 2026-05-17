@@ -1,10 +1,18 @@
 #pragma once
 
 #include <LoRa.h>
+#include "macros.h"
 
+#ifndef IS_SERIAL
 #define IS_SERIAL // シリアル通信でのデバッグ出力を有効にする
+#endif
 
 #define DEFAULT_FREQUENCY 433E6
+
+// macros
+#define SUCCESS 0
+#define FAILURE 255
+#define ENTER 1
 
 class Ra01{
     private:

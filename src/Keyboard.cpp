@@ -54,22 +54,22 @@ uint16_t Keyboard::idle(){
     return 0;
 }
 
-uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
+uint8_t Keyboard::getCharInput(){
     uint16_t buttonStat = idle();
-    if(strlen(output) + 1 >= maxLen) return FAILURE;
 
     if(mode == NUMBER_MODE){
         const char* numChars[] = {"1","2","3","4","5","6","7","8","9","0"};
         for(int i = 0; i < 10; i++){
             if(buttonStat & (1 << i)){
-                strcat(output, numChars[i]);
+                if(strlen(input) + 1 >= INPUT_MAX_LEN) return FAILURE;
+                strcat(input, numChars[i]);
                 break;
             }
         }
 
         if(buttonStat & (1 << 10)){ // Backspace
-            if(strlen(output) > 0){
-                output[strlen(output) - 1] = '\0';
+            if(strlen(input) > 0){
+                input[strlen(input) - 1] = '\0';
             } else {
                 #ifdef IS_SERIAL
                 Serial.println("Nothing to delete.");
@@ -80,7 +80,7 @@ uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
         if(buttonStat & (1 << 11)){ // Enter
             #ifdef IS_SERIAL
             Serial.println("-------------------------------------------");
-            Serial.print("Entered: "); Serial.println(output);
+            Serial.print("Entered: "); Serial.println(input);
             Serial.println("-------------------------------------------");
             #endif
             return ENTER;
@@ -101,8 +101,9 @@ uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
                 } else {
                     // 別のボタン → 前の選択を確定してから新しい選択を開始
                     if(pendingButtonBit != 255){
+                        if(strlen(input) + 1 >= INPUT_MAX_LEN) return FAILURE;
                         char ch[2] = {alpKeyBinds[pendingButtonBit][pendingCharIndex], '\0'};
-                        strcat(output, ch);
+                        strcat(input, ch);
                     }
                     pendingButtonBit = i;
                     pendingCharIndex = 0;
@@ -115,8 +116,8 @@ uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
             if(pendingButtonBit != 255){
                 // 未確定文字をキャンセル
                 pendingInit();
-            } else if(strlen(output) > 0){
-                output[strlen(output) - 1] = '\0';
+            } else if(strlen(input) > 0){
+                input[strlen(input) - 1] = '\0';
             } else {
                 #ifdef IS_SERIAL
                 Serial.println("Nothing to delete.");
@@ -126,15 +127,17 @@ uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
         }
         if(buttonStat & (1 << 11)){ // Enter
             if(pendingButtonBit != 255){
-                // 未確定文字を確定してバッファへ追加
-                char ch[2] = {alpKeyBinds[pendingButtonBit][pendingCharIndex], '\0'};
-                strcat(output, ch);
+                // 未確定文字を確定してバッファへ追加（満杯ならpendingをドロップして次のEnterで確定）
+                if(strlen(input) + 1 < INPUT_MAX_LEN){
+                    char ch[2] = {alpKeyBinds[pendingButtonBit][pendingCharIndex], '\0'};
+                    strcat(input, ch);
+                }
                 pendingInit();
             } else {
                 // 未確定なし → 入力完了
                 #ifdef IS_SERIAL
                 Serial.println("-------------------------------------------");
-                Serial.print("Entered: "); Serial.println(output);
+                Serial.print("Entered: "); Serial.println(input);
                 Serial.println("-------------------------------------------");
                 delay(1000);
                 #endif
@@ -151,7 +154,7 @@ uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
     }
 
     #ifdef IS_SERIAL
-    Serial.print(output);
+    Serial.print(input);
     if(mode == ALPHABET_MODE && pendingButtonBit != 255){
         Serial.print("[");
         Serial.print(alpKeyBinds[pendingButtonBit][pendingCharIndex]);
@@ -166,4 +169,10 @@ uint8_t Keyboard::getCharInput(char *output, uint16_t maxLen){
 void Keyboard::pendingInit(){
     pendingButtonBit = 255;
     pendingCharIndex = 0;
+}
+
+void Keyboard::inputInit(){
+    for(int i = 0; i < INPUT_MAX_LEN; i++){
+        input[i] = '\0';
+    }
 }

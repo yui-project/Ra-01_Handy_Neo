@@ -1,8 +1,14 @@
 #pragma once
 
 #include <ShiftIn.h>
+#include "macros.h"
 
+#ifndef IS_SERIAL
 #define IS_SERIAL // シリアル通信でのデバッグ出力を有効にする
+#endif
+
+// params
+#define INPUT_MAX_LEN 20
 
 // buttons
 #define BUTTON_NUM 16
@@ -22,8 +28,6 @@
 #define BUTTON_S 12 // Switch InputMode
 
 // macros
-#define SUCCESS 0
-#define FAILURE 255
 #define ENTER 1
 
 #define NUMBER_MODE 0
@@ -67,9 +71,12 @@ class Keyboard{
     public:
         void begin(int ploadPin, int dataPin, int clockPin);
         uint16_t idle();
-        uint8_t getCharInput(char *output, uint16_t maxLen);
+        uint8_t getCharInput();
 
         uint16_t getAllButtonStat();
         uint8_t getButtonStat(uint8_t num);
         void reloadButtonStat();
+
+        void inputInit();
+        char input[INPUT_MAX_LEN] = {0};
 };
