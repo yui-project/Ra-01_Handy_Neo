@@ -73,8 +73,9 @@ class Keyboard{
         uint16_t idle();
         uint8_t getCharInput();
 
-        uint16_t getAllButtonStat();
-        uint8_t getButtonStat(uint8_t num);
+        uint16_t getAllChStat();
+        uint8_t getChStat(uint8_t num);
+        bool getButtonStat(uint8_t num);
         void reloadButtonStat();
 
         void inputInit();

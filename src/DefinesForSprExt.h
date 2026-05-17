@@ -1,8 +1,12 @@
 // Situation Defines
 // #define BUTTON_TEST // ボタン類のテスト
 // #define ENTER_TEST // 文字入力テスト
- #define DISPLAY_TEST // ディスプレイ表示テスト
-// #define DEFAULT // 通常使用時
+// #define DISPLAY_TEST // ディスプレイ表示テスト // 非推奨
+// #define YUI_LOGO_TEST // 起動時に結ロゴを表示するテスト
+#define DEFAULT // 通常使用時
+
+// params
+#define OPENING_YUI_LOGO // 起動時に結ロゴを表示する
 
 // Digital Pins
 #define RA_CS 9

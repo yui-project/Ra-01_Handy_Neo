@@ -12,6 +12,10 @@ uint8_t Display::begin(){
         
         // while(1);
     }
+
+    display.clearDisplay();
+    display.display();
+
     return SUCCESS;
 }
 
@@ -52,11 +56,11 @@ uint8_t Display::showSeparateLine(){
 }
 
 uint8_t Display::showGuideToMenu(){
-    if(isMenuOpen) return FAILURE;
+    if(whatToShow != DEFAULT_MODE) return FAILURE;
     display.setTextSize(1);             // Normal 1:1 pixel scale
     display.setTextColor(WHITE);        // Draw white text
     display.setCursor(0,48);             // Start at top-left corner
-    display.println("Button 0: Open Menu");
+    display.println("0: Open Menu");
     return SUCCESS;
 }
 
@@ -71,7 +75,7 @@ uint8_t Display::clear(){
 }
 
 uint8_t Display::showMenu(){
-    if(!isMenuOpen) return FAILURE;
+    if(whatToShow != MENU_MODE) return FAILURE;
 
     display.setTextSize(1);             // Normal 1:1 pixel scale
     display.setTextColor(WHITE);        // Draw white text
@@ -92,16 +96,47 @@ uint8_t Display::showMenu(){
     return SUCCESS;
 }
 
-uint8_t Display::openMenu(){
-    isMenuOpen = true;
-    menuLastMillis = millis();
-    menuCount = 0;
+uint8_t Display::showChangeRecvMode(uint8_t recvMode){
+    if(whatToShow != CHANGE_RECV_MODE) return FAILURE;
+    display.setTextSize(1);             // Normal 1:1 pixel scale
+    display.setTextColor(WHITE);        // Draw white text
+    display.setCursor(0,48);             // Start at top-left corner
+    display.print("Recv mode: ");
+    display.println(recvMode ? "ON" : "OFF");
+    display.println("0: Back to Menu");
     return SUCCESS;
 }
 
-uint8_t Display::closeMenu(){
-    isMenuOpen = false;
-    menuLastMillis = 0;
-    menuCount = 0;
+uint8_t Display::showYuiLogo(){
+    display.drawBitmap(
+        (display.width()  - YUI_LOGO_WIDTH ) / 2, (uint8_t)(CHAR_DEFAULT_HEIGHT * 1.5), epd_bitmap_yui, YUI_LOGO_WIDTH, YUI_LOGO_HEIGHT, WHITE);
+
+    display.setTextSize(1);             // Normal 1:1 pixel scale
+    display.setTextColor(WHITE);        // Draw white text
+
+    display.setCursor(8, display.height() - (uint8_t)(CHAR_DEFAULT_HEIGHT * 2.5));
+    display.println("Ra-01 Handy Neo");
+
+    display.setCursor(8, display.height() - (uint8_t)(CHAR_DEFAULT_HEIGHT * 1.5));
+    display.println("Kazuma Kurokawa");
+
+    return SUCCESS;
+}
+
+uint8_t Display::getWhatToShow(){
+    return whatToShow;
+}
+
+uint8_t Display::changeWhatToShow(uint8_t wts){
+    whatToShow = wts;
+
+    if(whatToShow == MENU_MODE){
+        menuLastMillis = millis();
+        menuCount = 0;
+    }else if(whatToShow == DEFAULT_MODE){
+        menuLastMillis = 0;
+        menuCount = 0;
+    }
+    
     return SUCCESS;
 }
