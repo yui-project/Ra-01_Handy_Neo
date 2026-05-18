@@ -40,7 +40,7 @@ void loop() {
     #endif
 
     #ifdef ENTER_TEST
-    uint8_t val = key.getCharInput();
+    uint8_t val = key.processCharInput();
     if(val == ENTER){
         key.inputInit();
         delay(2000);
@@ -84,8 +84,10 @@ void loop() {
         if(recvMode){
             disp.showRecv("HELLOHELLOHELLOHELLO", millis(), "HELLOHELLOHELLOHELLOHELLO", millis() + 11111);
         }
-        key.idle();
         uint8_t wts = disp.getWhatToShow();
+        if(wts != SEND_MODE){
+            key.idle();
+        }
 
         if(wts == DEFAULT_MODE && key.getButtonStat(BUTTON_0)){
             disp.changeWhatToShow(MENU_MODE);
@@ -97,11 +99,25 @@ void loop() {
             Serial.println("Menu opened.");
         }
 
+        if(wts == SEND_MODE && key.processCharInput() == ENTER){
+            disp.changeWhatToShow(SEND_DONE_MODE);
+            Serial.print("Send: ");
+            Serial.println(key.getCharInput());
+            key.inputInit();
+        }
+
+        if(wts == SEND_DONE_MODE && key.getButtonStat(BUTTON_0)){
+            disp.changeWhatToShow(MENU_MODE);
+            Serial.println("Menu opened.");
+        }
+
         if(wts == MENU_MODE){
             if(key.getButtonStat(BUTTON_0)){
                 disp.changeWhatToShow(DEFAULT_MODE);
                 Serial.println("Menu closed.");
             }else if(key.getButtonStat(BUTTON_1)){
+                disp.changeWhatToShow(SEND_MODE);
+                Serial.println("Send mode opened.");
 
             }else if(key.getButtonStat(BUTTON_2)){
                 recvMode = !recvMode;
@@ -127,6 +143,9 @@ void loop() {
         disp.showGuideToMenu();
         disp.showMenu();
         disp.showChangeRecvMode(recvMode);
+        disp.showSend(key.getCharInput(), key.getPendingChar());
+        disp.showSendDone();
         disp.flush();
+        key.consumeAllEdges();
     #endif
 }

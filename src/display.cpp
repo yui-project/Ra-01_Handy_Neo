@@ -107,6 +107,27 @@ uint8_t Display::showChangeRecvMode(uint8_t recvMode){
     return SUCCESS;
 }
 
+uint8_t Display::showSend(const char* input, const char* pendingChar){
+    if(whatToShow != SEND_MODE) return FAILURE;
+    display.setTextSize(1);             // Normal 1:1 pixel scale
+    display.setTextColor(WHITE);        // Draw white text
+    display.setCursor(0,48);             // Start at top-left corner
+    display.println("Text (20c) / E: Send");
+    display.print(input);
+    display.print(pendingChar);
+    return SUCCESS;
+}
+
+uint8_t Display::showSendDone(){
+    if(whatToShow != SEND_DONE_MODE) return FAILURE;
+    display.setTextSize(1);             // Normal 1:1 pixel scale
+    display.setTextColor(WHITE);        // Draw white text
+    display.setCursor(0,48);             // Start at top-left corner
+    display.println("Send completed.");
+    display.println("0: Back to Menu");
+    return SUCCESS;
+}
+
 uint8_t Display::showYuiLogo(){
     display.drawBitmap(
         (display.width()  - YUI_LOGO_WIDTH ) / 2, (uint8_t)(CHAR_DEFAULT_HEIGHT * 1.5), epd_bitmap_yui, YUI_LOGO_WIDTH, YUI_LOGO_HEIGHT, WHITE);

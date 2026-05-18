@@ -71,7 +71,9 @@ class Keyboard{
     public:
         void begin(int ploadPin, int dataPin, int clockPin);
         uint16_t idle();
-        uint8_t getCharInput();
+        uint8_t processCharInput();
+        const char* getCharInput();
+        const char* getPendingChar();
 
         uint16_t getAllChStat();
         uint8_t getChStat(uint8_t num);
@@ -79,5 +81,6 @@ class Keyboard{
         void reloadButtonStat();
 
         void inputInit();
+        void consumeAllEdges();
         char input[INPUT_MAX_LEN] = {0};
 };

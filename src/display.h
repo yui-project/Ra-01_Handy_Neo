@@ -55,6 +55,8 @@ const unsigned char epd_bitmap_yui [] PROGMEM = {
 #define DEFAULT_MODE 0
 #define MENU_MODE 1
 #define CHANGE_RECV_MODE 2
+#define SEND_MODE 3
+#define SEND_DONE_MODE 4
 
 class Display{
     private:
@@ -73,6 +75,8 @@ class Display{
         uint8_t showGuideToMenu();
         uint8_t showMenu();
         uint8_t showChangeRecvMode(uint8_t recvMode);
+        uint8_t showSend(const char* input, const char* pendingChar);
+        uint8_t showSendDone();
         uint8_t showYuiLogo();
         uint8_t getWhatToShow();
         uint8_t changeWhatToShow(uint8_t wts);

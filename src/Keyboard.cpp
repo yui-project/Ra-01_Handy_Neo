@@ -62,7 +62,7 @@ uint16_t Keyboard::idle(){
     return 0;
 }
 
-uint8_t Keyboard::getCharInput(){
+uint8_t Keyboard::processCharInput(){
     uint16_t buttonStat = idle();
 
     if(mode == NUMBER_MODE){
@@ -174,6 +174,20 @@ uint8_t Keyboard::getCharInput(){
     return SUCCESS;
 }
 
+const char* Keyboard::getPendingChar(){
+    if(mode == ALPHABET_MODE && pendingButtonBit != 255){
+        static char pendingChar[2];
+        pendingChar[0] = alpKeyBinds[pendingButtonBit][pendingCharIndex];
+        pendingChar[1] = '\0';
+        return pendingChar;
+    }
+    return "";
+}
+
+const char* Keyboard::getCharInput(){
+    return input;
+}
+
 void Keyboard::pendingInit(){
     pendingButtonBit = 255;
     pendingCharIndex = 0;
@@ -183,4 +197,8 @@ void Keyboard::inputInit(){
     for(int i = 0; i < INPUT_MAX_LEN; i++){
         input[i] = '\0';
     }
+}
+
+void Keyboard::consumeAllEdges(){
+    risingEdgeBits = 0;
 }
