@@ -128,6 +128,96 @@ uint8_t Display::showSendDone(){
     return SUCCESS;
 }
 
+uint8_t Display::showChangeParams(const char* input){
+    if(whatToShow != CHANGE_TX_POWER_MODE && whatToShow != CHANGE_FREQ_MODE && whatToShow != CHANGE_SF_MODE && whatToShow != CHANGE_BW_MODE) return FAILURE;
+    display.setTextSize(1);             // Normal 1:1 pixel scale
+    display.setTextColor(WHITE);        // Draw white text
+    display.setCursor(0,48);             // Start at top-left corner
+
+    const char* msg;
+
+    if(whatToShow == CHANGE_TX_POWER_MODE){
+        msg = CHANGE_TX_POWER_MODE_MSG;
+    } else if(whatToShow == CHANGE_FREQ_MODE){
+        msg = CHANGE_FREQ_MODE_MSG;
+    } else if(whatToShow == CHANGE_SF_MODE){
+        msg = CHANGE_SF_MODE_MSG;
+    } else if(whatToShow == CHANGE_BW_MODE){
+        msg = CHANGE_BW_MODE_MSG;
+    }
+
+    if(millis() - nonMenuLastMillis >= MENU_SCROLL_INTERVAL_MS){
+        nonMenuCount = (nonMenuCount + 1) % strlen(msg);
+        nonMenuLastMillis = millis();
+    }
+
+    uint8_t msgLen = strlen(msg);
+    for(uint8_t i = 0; i < CHAR_MAX_LEN; i++){
+        char ch = msg[(nonMenuCount + i) % msgLen];
+        display.print(ch);
+    }
+
+    display.println(input);
+    return SUCCESS;
+}
+
+uint8_t Display::showChangeParamsDone(uint32_t param){
+    if(whatToShow != CHANGE_TX_POWER_DONE_MODE && whatToShow != CHANGE_FREQ_DONE_MODE && whatToShow != CHANGE_SF_DONE_MODE && whatToShow != CHANGE_BW_DONE_MODE) return FAILURE;
+    display.setTextSize(1);             // Normal 1:1 pixel scale
+    display.setTextColor(WHITE);        // Draw white text
+    display.setCursor(0,48);             // Start at top-left corner
+
+    if(whatToShow == CHANGE_TX_POWER_DONE_MODE){
+        display.print("TX Power[dbm]: ");
+        display.println(param);
+    } else if(whatToShow == CHANGE_FREQ_DONE_MODE){
+        display.print("Freq[Hz]: ");
+        display.println(param);
+    } else if(whatToShow == CHANGE_SF_DONE_MODE){
+        display.print("SF: ");
+        display.println(param);
+    } else if(whatToShow == CHANGE_BW_DONE_MODE){
+        display.print("BW: ");
+        display.println(param);
+    }
+    display.println("0: Back to Menu");
+    return SUCCESS;
+}
+
+uint8_t Display::showNowSettings(uint8_t recvMode, uint32_t txPower, uint32_t freq, uint32_t sf, uint32_t bw){
+    if(whatToShow != SHOW_NOW_SETTINGS_MODE) return FAILURE;
+    display.setTextSize(1);             // Normal 1:1 pixel scale
+    display.setTextColor(WHITE);        // Draw white text
+    display.setCursor(0,48);             // Start at top-left corner
+
+    display.println("Now settings:");
+
+    char msg[255] = "Recv mode: ";
+    strcat(msg, recvMode ? "ON" : "OFF");
+    strcat(msg, " / TX Power: ");
+    sprintf(msg + strlen(msg), "%d", txPower);
+    strcat(msg, " dBm / Freq: ");
+    sprintf(msg + strlen(msg), "%ld", freq);
+    strcat(msg, " Hz / SF: ");
+    sprintf(msg + strlen(msg), "%d", sf);
+    strcat(msg, " / BW: ");
+    sprintf(msg + strlen(msg), "%ld", bw);
+    strcat(msg, " Hz / 0: Back to Menu / ");
+    
+    if(millis() - nonMenuLastMillis >= MENU_SCROLL_INTERVAL_MS){
+        nonMenuCount = (nonMenuCount + 1) % strlen(msg);
+        nonMenuLastMillis = millis();
+    }
+
+    uint8_t msgLen = strlen(msg);
+    for(uint8_t i = 0; i < CHAR_MAX_LEN; i++){
+        char ch = msg[(nonMenuCount + i) % msgLen];
+        display.print(ch);
+    }
+
+    return SUCCESS;
+}
+
 uint8_t Display::showYuiLogo(){
     display.drawBitmap(
         (display.width()  - YUI_LOGO_WIDTH ) / 2, (uint8_t)(CHAR_DEFAULT_HEIGHT * 1.5), epd_bitmap_yui, YUI_LOGO_WIDTH, YUI_LOGO_HEIGHT, WHITE);
@@ -154,9 +244,14 @@ uint8_t Display::changeWhatToShow(uint8_t wts){
     if(whatToShow == MENU_MODE){
         menuLastMillis = millis();
         menuCount = 0;
+        nonMenuLastMillis = 0;
+        nonMenuCount = 0;
     }else if(whatToShow == DEFAULT_MODE){
         menuLastMillis = 0;
         menuCount = 0;
+    }else if(whatToShow == CHANGE_TX_POWER_MODE || whatToShow == CHANGE_FREQ_MODE || whatToShow == CHANGE_SF_MODE || whatToShow == CHANGE_BW_MODE){
+        nonMenuLastMillis = millis();
+        nonMenuCount = 0;
     }
     
     return SUCCESS;

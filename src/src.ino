@@ -12,6 +12,9 @@ char input[INPUT_MAX_LEN] = {0};
 
 static uint8_t recvMode = ON;
 
+long freq = DEFAULT_FREQUENCY;
+int txPower = DEFAULT_TX_POWER;
+
 void setup() {
     Serial.begin(115200);
 
@@ -84,8 +87,9 @@ void loop() {
         if(recvMode){
             disp.showRecv("HELLOHELLOHELLOHELLO", millis(), "HELLOHELLOHELLOHELLOHELLO", millis() + 11111);
         }
+
         uint8_t wts = disp.getWhatToShow();
-        if(wts != SEND_MODE){
+        if(wts != SEND_MODE && wts != CHANGE_TX_POWER_MODE && wts != CHANGE_FREQ_MODE && wts != CHANGE_SF_MODE && wts != CHANGE_BW_MODE){
             key.idle();
         }
 
@@ -106,7 +110,35 @@ void loop() {
             key.inputInit();
         }
 
-        if(wts == SEND_DONE_MODE && key.getButtonStat(BUTTON_0)){
+        if(wts == CHANGE_TX_POWER_MODE && key.processCharInput() == ENTER){
+            disp.changeWhatToShow(CHANGE_TX_POWER_DONE_MODE);
+            Serial.print("TX Power[dbm] set to: ");
+            Serial.println(key.getCharInput());
+            key.inputInit();
+        }
+
+        if(wts == CHANGE_FREQ_MODE && key.processCharInput() == ENTER){
+            disp.changeWhatToShow(CHANGE_FREQ_DONE_MODE);
+            Serial.print("Frequency set to: ");
+            Serial.println(key.getCharInput());
+            key.inputInit();
+        }
+
+        if(wts == CHANGE_SF_MODE && key.processCharInput() == ENTER){
+            disp.changeWhatToShow(CHANGE_SF_DONE_MODE);
+            Serial.print("SF set to: ");
+            Serial.println(key.getCharInput());
+            key.inputInit();
+        }
+
+        if(wts == CHANGE_BW_MODE && key.processCharInput() == ENTER){
+            disp.changeWhatToShow(CHANGE_BW_DONE_MODE);
+            Serial.print("BW set to: ");
+            Serial.println(key.getCharInput());
+            key.inputInit();
+        }
+        
+        if((wts == SEND_DONE_MODE || wts == CHANGE_TX_POWER_DONE_MODE || wts == CHANGE_FREQ_DONE_MODE || wts == CHANGE_SF_DONE_MODE || wts == CHANGE_BW_DONE_MODE) || (wts == SHOW_NOW_SETTINGS_MODE && key.getButtonStat(BUTTON_0))){
             disp.changeWhatToShow(MENU_MODE);
             Serial.println("Menu opened.");
         }
@@ -125,14 +157,24 @@ void loop() {
                 Serial.println("Receive mode changed.");
 
             }else if(key.getButtonStat(BUTTON_3)){
+                disp.changeWhatToShow(CHANGE_TX_POWER_MODE);
+                Serial.println("Change TX power mode opened.");
 
             }else if(key.getButtonStat(BUTTON_4)){
+                disp.changeWhatToShow(CHANGE_FREQ_MODE);
+                Serial.println("Change Freq. mode opened.");
 
             }else if(key.getButtonStat(BUTTON_5)){
+                disp.changeWhatToShow(CHANGE_SF_MODE);
+                Serial.println("Change SF mode opened.");
 
             }else if(key.getButtonStat(BUTTON_6)){
+                disp.changeWhatToShow(CHANGE_BW_MODE);
+                Serial.println("Change BW mode opened.");
 
             }else if(key.getButtonStat(BUTTON_7)){
+                disp.changeWhatToShow(SHOW_NOW_SETTINGS_MODE);
+                Serial.println("Now settings mode opened.");
 
             }else if(key.getButtonStat(BUTTON_8)){
 
@@ -145,6 +187,9 @@ void loop() {
         disp.showChangeRecvMode(recvMode);
         disp.showSend(key.getCharInput(), key.getPendingChar());
         disp.showSendDone();
+        disp.showChangeParams(key.getCharInput());
+        disp.showChangeParamsDone(1016); // TODO: Replace 0 with the actual parameter value // 実際の値をcheckする形でやる
+        disp.showNowSettings(recvMode, txPower, freq, 7, 125000); // TODO: Replace with actual settings values // 実際の設定値をcheckする形でやる
         disp.flush();
         key.consumeAllEdges();
     #endif

@@ -19,7 +19,13 @@
 
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 
+// for scrolling
 constexpr char* const MENU_MSG = "1: Send / 2: Recv ON/OFF / 3: TX Power / 4: Freq. / 5: SF / 6: BW / 7: Now Settings / 8: Log / 0: Close Menu / ";
+constexpr char* const CHANGE_TX_POWER_MODE_MSG = "TX Power [dbm] (2 - 20) / E: confirm  ";
+constexpr char* const CHANGE_FREQ_MODE_MSG = "Frequency [Hz] / E: confirm  ";
+constexpr char* const CHANGE_SF_MODE_MSG = "SF (7 - 12) / E: confirm  ";
+constexpr char* const CHANGE_BW_MODE_MSG = "BW (0: 7.8kHz, 1: 10.4kHz, 2: 15.6kHz, 3: 20.8kHz, 4: 31.3kHz, 5: 41.7kHz, 6: 62.5kHz, 7: 125kHz, 8: 250kHz) / E: confirm  ";
+
 
 #define YUI_LOGO_WIDTH 120
 #define YUI_LOGO_HEIGHT 25
@@ -57,7 +63,15 @@ const unsigned char epd_bitmap_yui [] PROGMEM = {
 #define CHANGE_RECV_MODE 2
 #define SEND_MODE 3
 #define SEND_DONE_MODE 4
-
+#define CHANGE_TX_POWER_MODE 5
+#define CHANGE_FREQ_MODE 6
+#define CHANGE_SF_MODE 7
+#define CHANGE_BW_MODE 8
+#define CHANGE_TX_POWER_DONE_MODE 9
+#define CHANGE_FREQ_DONE_MODE 10
+#define CHANGE_SF_DONE_MODE 11
+#define CHANGE_BW_DONE_MODE 12
+#define SHOW_NOW_SETTINGS_MODE 13
 class Display{
     private:
         Adafruit_SSD1306 display{SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET};
@@ -65,6 +79,8 @@ class Display{
         uint8_t whatToShow = DEFAULT_MODE;
         uint32_t menuLastMillis = 0;
         uint16_t menuCount = 0;
+        uint32_t nonMenuLastMillis = 0;
+        uint16_t nonMenuCount = 0;
 
     public:
         uint8_t begin();
@@ -77,6 +93,9 @@ class Display{
         uint8_t showChangeRecvMode(uint8_t recvMode);
         uint8_t showSend(const char* input, const char* pendingChar);
         uint8_t showSendDone();
+        uint8_t showChangeParams(const char* input);
+        uint8_t showChangeParamsDone(uint32_t param);
+        uint8_t showNowSettings(uint8_t recvMode, uint32_t txPower, uint32_t freq, uint32_t sf, uint32_t bw);
         uint8_t showYuiLogo();
         uint8_t getWhatToShow();
         uint8_t changeWhatToShow(uint8_t wts);

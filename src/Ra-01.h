@@ -8,6 +8,7 @@
 #endif
 
 #define DEFAULT_FREQUENCY 433E6
+#define DEFAULT_TX_POWER 17
 
 // macros
 #define SUCCESS 0
