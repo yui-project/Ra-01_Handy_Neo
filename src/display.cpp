@@ -34,6 +34,8 @@ uint8_t Display::showRecv(char *recv1, uint32_t recv1Millis, char *recv2, uint32
             display.print(recv1[i]);
         }
         display.println("...");
+    } else {
+        display.println("No Data");
     }
 
     display.print(recv2Millis);
@@ -45,6 +47,8 @@ uint8_t Display::showRecv(char *recv1, uint32_t recv1Millis, char *recv2, uint32
             display.print(recv2[i]);
         }
         display.println("...");
+    } else {
+        display.println("No Data");
     }
 
     return SUCCESS;
@@ -55,12 +59,14 @@ uint8_t Display::showSeparateLine(){
     return SUCCESS;
 }
 
-uint8_t Display::showGuideToMenu(){
+uint8_t Display::showGuideToMenu(uint8_t recvMode){
     if(whatToShow != DEFAULT_MODE) return FAILURE;
     display.setTextSize(1);             // Normal 1:1 pixel scale
     display.setTextColor(WHITE);        // Draw white text
     display.setCursor(0,48);             // Start at top-left corner
     display.println("0: Open Menu");
+    display.print("Recv mode: ");
+    display.println(recvMode ? "ON" : "OFF");
     return SUCCESS;
 }
 
@@ -202,7 +208,7 @@ uint8_t Display::showNowSettings(uint8_t recvMode, uint32_t txPower, uint32_t fr
     sprintf(msg + strlen(msg), "%d", sf);
     strcat(msg, " / BW: ");
     sprintf(msg + strlen(msg), "%ld", bw);
-    strcat(msg, " Hz / 0: Back to Menu / ");
+    strcat(msg, "  / 0: Back to Menu / ");
     
     if(millis() - nonMenuLastMillis >= MENU_SCROLL_INTERVAL_MS){
         nonMenuCount = (nonMenuCount + 1) % strlen(msg);

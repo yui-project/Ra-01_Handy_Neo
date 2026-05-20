@@ -8,6 +8,9 @@
 // params
 #define OPENING_YUI_LOGO // 起動時に結ロゴを表示する
 
+#define LOG_CAPACITY 128
+#define LOG_DATA_MAX_LEN 64
+
 // Digital Pins
 #define RA_CS 9
 #define RA_RESET 10

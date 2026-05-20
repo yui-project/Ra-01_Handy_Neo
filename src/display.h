@@ -20,11 +20,11 @@
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 
 // for scrolling
-constexpr char* const MENU_MSG = "1: Send / 2: Recv ON/OFF / 3: TX Power / 4: Freq. / 5: SF / 6: BW / 7: Now Settings / 8: Log / 0: Close Menu / ";
+constexpr char* const MENU_MSG = "1: Send / 2: Recv ON/OFF / 3: TX Power / 4: Freq. / 5: SF / 6: BW / 7: Now Settings / 8: Log Save / 0: Close Menu / ";
 constexpr char* const CHANGE_TX_POWER_MODE_MSG = "TX Power [dbm] (2 - 20) / E: confirm  ";
 constexpr char* const CHANGE_FREQ_MODE_MSG = "Frequency [Hz] / E: confirm  ";
-constexpr char* const CHANGE_SF_MODE_MSG = "SF (7 - 12) / E: confirm  ";
-constexpr char* const CHANGE_BW_MODE_MSG = "BW (0: 7.8kHz, 1: 10.4kHz, 2: 15.6kHz, 3: 20.8kHz, 4: 31.3kHz, 5: 41.7kHz, 6: 62.5kHz, 7: 125kHz, 8: 250kHz) / E: confirm  ";
+constexpr char* const CHANGE_SF_MODE_MSG = "SF (6 - 12) / E: confirm  ";
+constexpr char* const CHANGE_BW_MODE_MSG = "BW (0: 7.8kHz, 1: 10.4kHz, 2: 15.6kHz, 3: 20.8kHz, 4: 31.3kHz, 5: 41.7kHz, 6: 62.5kHz, 7: 125kHz, 8: 250kHz, 9: 500kHz) / E: confirm  ";
 
 
 #define YUI_LOGO_WIDTH 120
@@ -88,7 +88,7 @@ class Display{
         uint8_t clear();
         uint8_t showRecv(char *recv1, uint32_t recv1Millis, char *recv2, uint32_t recv2Millis);
         uint8_t showSeparateLine();
-        uint8_t showGuideToMenu();
+        uint8_t showGuideToMenu(uint8_t recvMode);
         uint8_t showMenu();
         uint8_t showChangeRecvMode(uint8_t recvMode);
         uint8_t showSend(const char* input, const char* pendingChar);

@@ -6,20 +6,48 @@
 
 Keyboard key;
 Display disp;
+Ra01 ra;
 
-#define INPUT_MAX_LEN 20
-char input[INPUT_MAX_LEN] = {0};
+typedef enum {LOG_RECV, LOG_SEND, LOG_CHANGE_RECV_MODE, LOG_CHANGE_TX_POWER, LOG_CHANGE_FREQ, LOG_CHANGE_SF, LOG_CHANGE_BW} logType;
+
+typedef struct{
+    logType type;
+    uint32_t millis;
+    char data[LOG_DATA_MAX_LEN];
+    int rssi;
+} logEntry;
+
+static logEntry logArray[LOG_CAPACITY] = {0};
+static uint8_t logCount = 0;
 
 static uint8_t recvMode = ON;
+static long freq = DEFAULT_FREQUENCY;
+static uint8_t txPower = DEFAULT_TX_POWER;
+static uint8_t sf = DEFAULT_SF;
+static uint8_t bw = DEFAULT_BW;
 
-long freq = DEFAULT_FREQUENCY;
-int txPower = DEFAULT_TX_POWER;
+void makeLog(logType type, const char* data, int rssi = 0){
+    logArray[logCount].type = type;
+    logArray[logCount].millis = millis();
+    strncpy(logArray[logCount].data, data, LOG_DATA_MAX_LEN);
+    logArray[logCount].rssi = rssi;
+    logCount = (logCount + 1) % LOG_CAPACITY;
+}
+
+void saveLogToSDCard(logEntry* logBuffer, uint8_t logSize){
+    // TODO: SDカードにログを保存する処理を書く
+}
 
 void setup() {
     Serial.begin(115200);
 
     key.begin(BSR_PL, BSR_SO, BSR_CP);
     disp.begin();
+    if(ra.begin(RA_CS, RA_RESET, RA_DIO0) == FAILURE){
+        #ifdef IS_SERIAL
+        Serial.println("Failed to initialize Ra01.");
+        #endif
+    }
 
     #ifdef OPENING_YUI_LOGO
     disp.showYuiLogo();
@@ -84,8 +112,24 @@ void loop() {
 
     #ifdef DEFAULT
         disp.clear();
+
+        if(logCount >= LOG_CAPACITY){
+            saveLogToSDCard(logArray, LOG_CAPACITY);
+            logCount = 0;
+        }
+
         if(recvMode){
-            disp.showRecv("HELLOHELLOHELLOHELLO", millis(), "HELLOHELLOHELLOHELLOHELLO", millis() + 11111);
+            if(ra.recv(logArray[logCount].data, LOG_DATA_MAX_LEN) > 0){
+                logArray[logCount].millis = millis();
+                logArray[logCount].type = LOG_RECV;
+                logArray[logCount].rssi = ra.getRssi();
+                logCount = (logCount + 1) % LOG_CAPACITY;
+
+                #ifdef IS_SERIAL
+                Serial.print("Received: ");
+                Serial.println(logArray[logCount].data);
+                #endif
+            }
         }
 
         uint8_t wts = disp.getWhatToShow();
@@ -95,101 +139,211 @@ void loop() {
 
         if(wts == DEFAULT_MODE && key.getButtonStat(BUTTON_0)){
             disp.changeWhatToShow(MENU_MODE);
+
+            #ifdef IS_SERIAL
             Serial.println("Menu opened.");
+            #endif
         }
 
         if(wts == CHANGE_RECV_MODE && key.getButtonStat(BUTTON_0)){
             disp.changeWhatToShow(MENU_MODE);
+            makeLog(LOG_CHANGE_RECV_MODE, recvMode ? "ON" : "OFF");
+
+            #ifdef IS_SERIAL
             Serial.println("Menu opened.");
+            #endif
         }
 
         if(wts == SEND_MODE && key.processCharInput() == ENTER){
             disp.changeWhatToShow(SEND_DONE_MODE);
+            makeLog(LOG_SEND, key.getCharInput());
+            ra.send(key.getCharInput(), strlen(key.getCharInput()));
+
+            #ifdef IS_SERIAL
             Serial.print("Send: ");
             Serial.println(key.getCharInput());
+            #endif
+
             key.inputInit();
         }
 
         if(wts == CHANGE_TX_POWER_MODE && key.processCharInput() == ENTER){
             disp.changeWhatToShow(CHANGE_TX_POWER_DONE_MODE);
+
+            uint8_t val = atoi(key.getCharInput());
+            if(val >= 2 && val <= 20){
+                txPower = val;
+                ra.setTxPower(val);
+                makeLog(LOG_CHANGE_TX_POWER, key.getCharInput());
+
+            } else {
+                key.inputInit();
+                #ifdef IS_SERIAL
+                Serial.println("Invalid TX Power value. Must be between 2 and 20.");
+                #endif
+            }
+            
+            #ifdef IS_SERIAL
             Serial.print("TX Power[dbm] set to: ");
-            Serial.println(key.getCharInput());
+            Serial.println(txPower);
+            #endif
+
             key.inputInit();
         }
 
         if(wts == CHANGE_FREQ_MODE && key.processCharInput() == ENTER){
             disp.changeWhatToShow(CHANGE_FREQ_DONE_MODE);
+
+            long val = atol(key.getCharInput());
+            if(val >= 137000000 && val <= 1020000000){
+                freq = val;
+                ra.setFreq(val);
+                makeLog(LOG_CHANGE_FREQ, key.getCharInput());
+            } else {    
+                key.inputInit();
+                #ifdef IS_SERIAL
+                Serial.println("Invalid Frequency value. Must be between 137000000 and 1020000000.");
+                #endif
+            }
+
+            #ifdef IS_SERIAL
             Serial.print("Frequency set to: ");
-            Serial.println(key.getCharInput());
+            Serial.println(freq);
+            #endif
+
             key.inputInit();
         }
 
         if(wts == CHANGE_SF_MODE && key.processCharInput() == ENTER){
             disp.changeWhatToShow(CHANGE_SF_DONE_MODE);
+
+            uint8_t val = atoi(key.getCharInput());
+            if(val >= 6 && val <= 12){
+                sf = val;
+                ra.setSF(val);
+                makeLog(LOG_CHANGE_SF, key.getCharInput());
+            } else {
+                key.inputInit();
+                #ifdef IS_SERIAL
+                Serial.println("Invalid SF value. Must be between 6 and 12.");
+                #endif
+            }
+
+            #ifdef IS_SERIAL
             Serial.print("SF set to: ");
             Serial.println(key.getCharInput());
+            #endif
+
             key.inputInit();
         }
 
         if(wts == CHANGE_BW_MODE && key.processCharInput() == ENTER){
             disp.changeWhatToShow(CHANGE_BW_DONE_MODE);
+
+            uint8_t val = atoi(key.getCharInput());
+            if(val <= 9){
+                bw = val;
+                makeLog(LOG_CHANGE_BW, key.getCharInput());
+                ra.setBW(val);
+            } else {
+                key.inputInit();
+                #ifdef IS_SERIAL
+                Serial.println("Invalid BW value. Must be between 0 and 9.");
+                #endif
+            }
+
+            #ifdef IS_SERIAL
             Serial.print("BW set to: ");
             Serial.println(key.getCharInput());
+            #endif
+
             key.inputInit();
         }
         
-        if((wts == SEND_DONE_MODE || wts == CHANGE_TX_POWER_DONE_MODE || wts == CHANGE_FREQ_DONE_MODE || wts == CHANGE_SF_DONE_MODE || wts == CHANGE_BW_DONE_MODE) || (wts == SHOW_NOW_SETTINGS_MODE && key.getButtonStat(BUTTON_0))){
+        if((wts == SEND_DONE_MODE || wts == CHANGE_TX_POWER_DONE_MODE || wts == CHANGE_FREQ_DONE_MODE || wts == CHANGE_SF_DONE_MODE || wts == CHANGE_BW_DONE_MODE || wts == SHOW_NOW_SETTINGS_MODE) && key.getButtonStat(BUTTON_0)){
             disp.changeWhatToShow(MENU_MODE);
+
+            #ifdef IS_SERIAL
             Serial.println("Menu opened.");
+            #endif
         }
 
         if(wts == MENU_MODE){
             if(key.getButtonStat(BUTTON_0)){
                 disp.changeWhatToShow(DEFAULT_MODE);
+
+                #ifdef IS_SERIAL
                 Serial.println("Menu closed.");
+                #endif
             }else if(key.getButtonStat(BUTTON_1)){
                 disp.changeWhatToShow(SEND_MODE);
-                Serial.println("Send mode opened.");
 
+                #ifdef IS_SERIAL
+                Serial.println("Send mode opened.");
+                #endif
             }else if(key.getButtonStat(BUTTON_2)){
                 recvMode = !recvMode;
                 disp.changeWhatToShow(CHANGE_RECV_MODE);
-                Serial.println("Receive mode changed.");
 
+                #ifdef IS_SERIAL
+                Serial.println("Receive mode changed.");
+                #endif
             }else if(key.getButtonStat(BUTTON_3)){
                 disp.changeWhatToShow(CHANGE_TX_POWER_MODE);
-                Serial.println("Change TX power mode opened.");
 
+                #ifdef IS_SERIAL
+                Serial.println("Change TX power mode opened.");
+                #endif
             }else if(key.getButtonStat(BUTTON_4)){
                 disp.changeWhatToShow(CHANGE_FREQ_MODE);
-                Serial.println("Change Freq. mode opened.");
 
+                #ifdef IS_SERIAL
+                Serial.println("Change Freq. mode opened.");
+                #endif
             }else if(key.getButtonStat(BUTTON_5)){
                 disp.changeWhatToShow(CHANGE_SF_MODE);
-                Serial.println("Change SF mode opened.");
 
+                #ifdef IS_SERIAL
+                Serial.println("Change SF mode opened.");
+                #endif
             }else if(key.getButtonStat(BUTTON_6)){
                 disp.changeWhatToShow(CHANGE_BW_MODE);
-                Serial.println("Change BW mode opened.");
 
+                #ifdef IS_SERIAL
+                Serial.println("Change BW mode opened.");
+                #endif
             }else if(key.getButtonStat(BUTTON_7)){
                 disp.changeWhatToShow(SHOW_NOW_SETTINGS_MODE);
+
+                #ifdef IS_SERIAL
                 Serial.println("Now settings mode opened.");
+                #endif
 
             }else if(key.getButtonStat(BUTTON_8)){
 
             }
         }
 
+        // disp.showRecv(recvData[recvDataCount - 1], recvMillis[recvDataCount - 1], recvData[recvDataCount], recvMillis[recvDataCount]); // TODO: ログのうち、受信データのみを拾い上げるようにする
         disp.showSeparateLine();
-        disp.showGuideToMenu();
+        disp.showGuideToMenu(recvMode);
         disp.showMenu();
         disp.showChangeRecvMode(recvMode);
         disp.showSend(key.getCharInput(), key.getPendingChar());
         disp.showSendDone();
         disp.showChangeParams(key.getCharInput());
-        disp.showChangeParamsDone(1016); // TODO: Replace 0 with the actual parameter value // 実際の値をcheckする形でやる
-        disp.showNowSettings(recvMode, txPower, freq, 7, 125000); // TODO: Replace with actual settings values // 実際の設定値をcheckする形でやる
+
+        if(wts == CHANGE_TX_POWER_DONE_MODE){
+            disp.showChangeParamsDone(txPower);
+        } else if(wts == CHANGE_FREQ_DONE_MODE){
+            disp.showChangeParamsDone(freq);
+        } else if(wts == CHANGE_SF_DONE_MODE){
+            disp.showChangeParamsDone(sf);
+        } else if(wts == CHANGE_BW_DONE_MODE){
+            disp.showChangeParamsDone(bw);
+        }
+
+        disp.showNowSettings(recvMode, txPower, freq, sf, bw);
         disp.flush();
         key.consumeAllEdges();
     #endif
