@@ -60,7 +60,9 @@ uint8_t Ra01::setSF(uint8_t sf){
 uint8_t Ra01::setBW(uint8_t bw){
     if(bw > 9) return FAILURE; // 0~9以外は入力値として不適切
 
-    LoRa.setSignalBandwidth(bw);
+    static const long bwMap[] = {7800, 10400, 15600, 20800, 31250, 41700, 62500, 125000, 250000, 500000};
+
+    LoRa.setSignalBandwidth(bwMap[bw]);
     return SUCCESS;
 } 
 

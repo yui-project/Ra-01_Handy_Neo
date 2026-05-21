@@ -36,7 +36,8 @@ static uint8_t bw = DEFAULT_BW;
 void makeLog(logType type, const char* data, int rssi = 0){
     logArray[logCount].type = type;
     logArray[logCount].millis = millis();
-    strncpy(logArray[logCount].data, data, LOG_DATA_MAX_LEN);
+    strncpy(logArray[logCount].data, data, LOG_DATA_MAX_LEN - 1);
+    logArray[logCount].data[LOG_DATA_MAX_LEN - 1] = '\0'; // Ensure null-termination
     logArray[logCount].rssi = rssi;
     logCount = (logCount + 1) % LOG_CAPACITY;
 }
@@ -194,7 +195,7 @@ void loop() {
 
                 #ifdef IS_SERIAL
                 Serial.print("Received: ");
-                Serial.println(logArray[logCount].data);
+                Serial.println(logArray[(logCount - 1 + LOG_CAPACITY) % LOG_CAPACITY].data);
                 #endif
             }
         }

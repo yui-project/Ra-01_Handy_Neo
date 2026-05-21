@@ -19,7 +19,7 @@ uint8_t Display::begin(){
     return SUCCESS;
 }
 
-uint8_t Display::showRecv(char *recv1, uint32_t recv1Millis, char *recv2, uint32_t recv2Millis){
+uint8_t Display::showRecv(const char *recv1, uint32_t recv1Millis, const char *recv2, uint32_t recv2Millis){
     display.setTextSize(1);             // Normal 1:1 pixel scale
     display.setTextColor(WHITE);        // Draw white text
     display.setCursor(0,0);             // Start at top-left corner
