@@ -3,10 +3,6 @@
 #include <LoRa.h>
 #include "macros.h"
 
-#ifndef IS_SERIAL
-#define IS_SERIAL // シリアル通信でのデバッグ出力を有効にする
-#endif
-
 #define DEFAULT_FREQUENCY 436500000
 #define DEFAULT_TX_POWER 17
 #define DEFAULT_SF 7

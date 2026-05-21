@@ -190,7 +190,7 @@ uint8_t Display::showChangeParamsDone(uint32_t param){
     return SUCCESS;
 }
 
-uint8_t Display::showNowSettings(uint8_t recvMode, uint32_t txPower, uint32_t freq, uint32_t sf, uint32_t bw){
+uint8_t Display::showNowSettings(bool isSDEnabled, uint8_t recvMode, uint32_t txPower, uint32_t freq, uint32_t sf, uint32_t bw){
     if(whatToShow != SHOW_NOW_SETTINGS_MODE) return FAILURE;
     display.setTextSize(1);             // Normal 1:1 pixel scale
     display.setTextColor(WHITE);        // Draw white text
@@ -198,7 +198,9 @@ uint8_t Display::showNowSettings(uint8_t recvMode, uint32_t txPower, uint32_t fr
 
     display.println("Now settings:");
 
-    char msg[255] = "Recv mode: ";
+    char msg[255] = "  SD Card: ";
+    strcat(msg, isSDEnabled ? "MOUNTED" : "NOT MOUNTED");
+    strcat(msg, " / Recv mode: ");
     strcat(msg, recvMode ? "ON" : "OFF");
     strcat(msg, " / TX Power: ");
     sprintf(msg + strlen(msg), "%d", txPower);
@@ -221,6 +223,17 @@ uint8_t Display::showNowSettings(uint8_t recvMode, uint32_t txPower, uint32_t fr
         display.print(ch);
     }
 
+    return SUCCESS;
+}
+
+uint8_t Display::showLogSaveDone(uint8_t num){
+    if(whatToShow != SHOW_LOG_SAVE_DONE_MODE) return FAILURE;
+    display.setTextSize(1);             // Normal 1:1 pixel scale
+    display.setTextColor(WHITE);        // Draw white text
+    display.setCursor(0,48);             // Start at top-left corner
+    display.print(num);
+    display.println(" logs saved.");
+    display.println("0: Back to Menu");
     return SUCCESS;
 }
 

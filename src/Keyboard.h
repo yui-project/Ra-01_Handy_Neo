@@ -3,10 +3,6 @@
 #include <ShiftIn.h>
 #include "macros.h"
 
-#ifndef IS_SERIAL
-#define IS_SERIAL // シリアル通信でのデバッグ出力を有効にする
-#endif
-
 // params
 #define INPUT_MAX_LEN 20
 

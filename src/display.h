@@ -5,10 +5,6 @@
 #include <Adafruit_SSD1306.h>
 #include "macros.h"
 
-#ifndef IS_SERIAL
-#define IS_SERIAL // シリアル通信でのデバッグ出力を有効にする
-#endif
-
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 #define CHAR_DEFAULT_HEIGHT 8
@@ -72,6 +68,7 @@ const unsigned char epd_bitmap_yui [] PROGMEM = {
 #define CHANGE_SF_DONE_MODE 11
 #define CHANGE_BW_DONE_MODE 12
 #define SHOW_NOW_SETTINGS_MODE 13
+#define SHOW_LOG_SAVE_DONE_MODE 14
 class Display{
     private:
         Adafruit_SSD1306 display{SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET};
@@ -95,7 +92,8 @@ class Display{
         uint8_t showSendDone();
         uint8_t showChangeParams(const char* input);
         uint8_t showChangeParamsDone(uint32_t param);
-        uint8_t showNowSettings(uint8_t recvMode, uint32_t txPower, uint32_t freq, uint32_t sf, uint32_t bw);
+        uint8_t showNowSettings(bool isSDEnabled, uint8_t recvMode, uint32_t txPower, uint32_t freq, uint32_t sf, uint32_t bw);
+        uint8_t showLogSaveDone(uint8_t num);
         uint8_t showYuiLogo();
         uint8_t getWhatToShow();
         uint8_t changeWhatToShow(uint8_t wts);
