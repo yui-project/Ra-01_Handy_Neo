@@ -398,8 +398,30 @@ void loop() {
             }
         }
 
-        // disp.showRecv(recvData[recvDataCount - 1], recvMillis[recvDataCount - 1], recvData[recvDataCount], recvMillis[recvDataCount]); // TODO: ログのうち、受信データのみを拾い上げるようにする
-        // TODO: 正しい受信を入れる
+        int nowRecvDataNum = RECV_DATA_NUM_INIT;
+        int beforeRecvDataNum = RECV_DATA_NUM_INIT;
+        
+        for(int i = 1; i <= LOG_CAPACITY; i++){
+            int checkIndex = (logCount - i + LOG_CAPACITY) % LOG_CAPACITY;
+
+            if(logArray[checkIndex].type == LOG_RECV){
+                if(nowRecvDataNum == RECV_DATA_NUM_INIT){
+                    nowRecvDataNum = checkIndex;
+                }
+                else if(beforeRecvDataNum == RECV_DATA_NUM_INIT){
+                    beforeRecvDataNum = checkIndex;
+                    break;
+                }
+            }
+        }
+
+        disp.showRecv(
+            (beforeRecvDataNum != RECV_DATA_NUM_INIT) ? logArray[beforeRecvDataNum].data : "",
+            (beforeRecvDataNum != RECV_DATA_NUM_INIT) ? logArray[beforeRecvDataNum].millis : 0,
+            (nowRecvDataNum != RECV_DATA_NUM_INIT) ? logArray[nowRecvDataNum].data : "",
+            (nowRecvDataNum != RECV_DATA_NUM_INIT) ? logArray[nowRecvDataNum].millis : 0
+        );
+
         disp.showSeparateLine();
         disp.showGuideToMenu(recvMode);
         disp.showMenu();
