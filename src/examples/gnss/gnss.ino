@@ -93,3 +93,7 @@ bool isRtcInitialized() {
   RtcTime now = RTC.getTime();
   return (now.year() >= 2000); // 2000年以降の日付があれば初期化済みとみなす
 }
+
+// Memo: 計測までの時間
+// 本部ベランダ: 1min ~ 1min30sec
+// 本部室内(地上局テーブル上): 5min程度
