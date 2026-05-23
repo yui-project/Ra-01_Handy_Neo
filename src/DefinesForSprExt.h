@@ -5,6 +5,8 @@
 // #define YUI_LOGO_TEST // 起動時に結ロゴを表示するテスト
 #define DEFAULT // 通常使用時
 
+#define IS_SERIAL // 【すべてのコンポーネントで】シリアル通信でのデバッグ出力を有効にする
+
 // params
 #define OPENING_YUI_LOGO // 起動時に結ロゴを表示する
 
