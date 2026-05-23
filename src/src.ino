@@ -1,18 +1,22 @@
 #include <Arduino.h>
 #include <SDHCI.h>
 #include <File.h>
+#include <GNSS.h>
+#include <RTC.h>
 #include "Ra-01.h"
 #include "DefinesForSprExt.h"
 #include "Keyboard.h"
 #include "display.h"
 
-Keyboard key;
-Display disp;
-Ra01 ra;
-SDClass sd;
-File logFile;
+static Keyboard key;
+static Display disp;
+static Ra01 ra;
+static SDClass sd;
+static File logFile;
+static SpGnss gnss;
 
 static bool isSDEnabled = false; // SDカードを使用するかのフラグ
+static bool rtcInitialized = false; // RTCが初期化されているかのフラグ
 
 typedef enum {LOG_RECV, LOG_SEND, LOG_CHANGE_RECV_MODE, LOG_CHANGE_TX_POWER, LOG_CHANGE_FREQ, LOG_CHANGE_SF, LOG_CHANGE_BW} logType;
 
@@ -80,6 +84,39 @@ void saveLogToSDCard(logEntry* logBuffer, uint8_t logSize){
     }
 }
 
+bool syncRtcWithGnss(){
+    if(gnss.waitUpdate(0)){
+        SpNavData navData;
+        gnss.getNavData(&navData);
+
+        if(navData.time.year >= 2000){ // 2000年以降であれば、正しい年を受け取ったとする
+            RtcTime rtc_time{
+                navData.time.year,
+                navData.time.month,
+                navData.time.day,
+                navData.time.hour,
+                navData.time.minute,
+                navData.time.sec
+            };
+
+            RTC.setTime(rtc_time);
+
+            #ifdef IS_SERIAL
+            Serial.println("RTC synchronized with GNSS time:");
+            #endif
+            
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool isRtcInitialized(){
+    RtcTime now = RTC.getTime();
+    return (now.year() > 2000); // RTCの年が2000年より大きければ初期化されているとみなす
+}
+
 void setup() {
     #ifdef IS_SERIAL
     Serial.begin(115200);
@@ -90,6 +127,29 @@ void setup() {
     if(ra.begin(RA_CS, RA_RESET, RA_DIO0) == FAILURE){
         #ifdef IS_SERIAL
         Serial.println("Failed to initialize Ra01.");
+        #endif
+    }
+
+    RTC.begin();
+    if(!isRtcInitialized()){
+        if(gnss.begin() != SUCCESS){
+            #ifdef IS_SERIAL
+            Serial.println("Failed to initialize GNSS.");
+            #endif
+        }
+
+        gnss.select(GPS);
+        gnss.select(QZ_L1CA); // TODO: 必要？
+        gnss.select(QZ_L1S); // TODO: 必要？
+
+        if(gnss.start(COLD_START) != SUCCESS){
+            #ifdef IS_SERIAL
+            Serial.println("Failed to start GNSS.");
+            #endif
+        }
+
+        #ifdef IS_SERIAL
+        Serial.println("Waiting for GNSS signals...");
         #endif
     }
 
@@ -178,6 +238,18 @@ void loop() {
     #endif
 
     #ifdef DEFAULT
+        if(!rtcInitialized){
+            if(syncRtcWithGnss()){
+                rtcInitialized = true;
+                gnss.stop();
+                gnss.end();
+
+                #ifdef IS_SERIAL
+                Serial.println("Sync between RTC and GNSS has done!");
+                #endif
+            }
+        }
+
         disp.clear();
 
         if(logCount >= LOG_CAPACITY - 1){
