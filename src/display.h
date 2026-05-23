@@ -83,7 +83,7 @@ class Display{
         uint8_t begin();
         uint8_t flush();
         uint8_t clear();
-        uint8_t showRecv(const char *recv1, uint32_t recv1Millis, const char *recv2, uint32_t recv2Millis);
+        uint8_t showRecv(const char *recv1, const char *recv1Time, const char *recv2, const char *recv2Time);
         uint8_t showSeparateLine();
         uint8_t showGuideToMenu(uint8_t recvMode);
         uint8_t showMenu();
@@ -92,7 +92,7 @@ class Display{
         uint8_t showSendDone();
         uint8_t showChangeParams(const char* input);
         uint8_t showChangeParamsDone(uint32_t param);
-        uint8_t showNowSettings(bool isSDEnabled, uint8_t recvMode, uint32_t txPower, uint32_t freq, uint32_t sf, uint32_t bw);
+        uint8_t showNowSettings(const char* nowTime, bool isSDEnabled, uint8_t recvMode, uint32_t txPower, uint32_t freq, uint32_t sf, uint32_t bw);
         uint8_t showLogSaveDone(uint8_t num);
         uint8_t showYuiLogo();
         uint8_t getWhatToShow();
