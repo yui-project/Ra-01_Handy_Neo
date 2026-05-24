@@ -19,13 +19,13 @@ uint8_t Display::begin(){
     return SUCCESS;
 }
 
-uint8_t Display::showRecv(const char *recv1, uint32_t recv1Millis, const char *recv2, uint32_t recv2Millis){
+uint8_t Display::showRecv(const char *recv1, const char *recv1Time, const char *recv2, const char *recv2Time){
     display.setTextSize(1);             // Normal 1:1 pixel scale
     display.setTextColor(WHITE);        // Draw white text
     display.setCursor(0,0);             // Start at top-left corner
     display.println("Received:");
 
-    display.print(recv1Millis);
+    display.print(recv1Time);
     display.println(" :");
     if(strlen(recv1) > 0 && strlen(recv1) < CHAR_MAX_LEN){
         display.println(recv1);
@@ -38,7 +38,7 @@ uint8_t Display::showRecv(const char *recv1, uint32_t recv1Millis, const char *r
         display.println("No Data");
     }
 
-    display.print(recv2Millis);
+    display.print(recv2Time);
     display.println(" :");
     if(strlen(recv2) > 0 && strlen(recv2) < CHAR_MAX_LEN){
         display.println(recv2);
@@ -190,7 +190,7 @@ uint8_t Display::showChangeParamsDone(uint32_t param){
     return SUCCESS;
 }
 
-uint8_t Display::showNowSettings(bool isSDEnabled, uint8_t recvMode, uint32_t txPower, uint32_t freq, uint32_t sf, uint32_t bw){
+uint8_t Display::showNowSettings(const char* nowTime, bool isSDEnabled, uint8_t recvMode, uint32_t txPower, uint32_t freq, uint32_t sf, uint32_t bw){
     if(whatToShow != SHOW_NOW_SETTINGS_MODE) return FAILURE;
     display.setTextSize(1);             // Normal 1:1 pixel scale
     display.setTextColor(WHITE);        // Draw white text
@@ -198,7 +198,9 @@ uint8_t Display::showNowSettings(bool isSDEnabled, uint8_t recvMode, uint32_t tx
 
     display.println("Now settings:");
 
-    char msg[255] = "  SD Card: ";
+    char msg[255] = " Now time: ";
+    strcat(msg, nowTime);
+    strcat(msg, " / SD Card: ");
     strcat(msg, isSDEnabled ? "MOUNTED" : "NOT MOUNTED");
     strcat(msg, " / Recv mode: ");
     strcat(msg, recvMode ? "ON" : "OFF");
